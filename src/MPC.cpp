@@ -1,25 +1,6 @@
+#include "kinematic_solver.h"
 #include "MPC.h"
-#include <cppad/cppad.hpp>
-#include <cppad/ipopt/solve.hpp>
-#include "Eigen-3.3/Eigen/Core"
 
-using CppAD::AD;
-
-// TODO: Set the timestep length and duration
-size_t N = 0;
-double dt = 0;
-
-// This value assumes the model presented in the classroom is used.
-//
-// It was obtained by measuring the radius formed by running the vehicle in the
-// simulator around in a circle with a constant steering angle and velocity on a
-// flat terrain.
-//
-// Lf was tuned until the the radius formed by the simulating the model
-// presented in the classroom matched the previous radius.
-//
-// This is the length from front to CoG that has a similar radius.
-const double Lf = 2.67;
 
 class FG_eval {
  public:
@@ -27,7 +8,11 @@ class FG_eval {
   Eigen::VectorXd coeffs;
   FG_eval(Eigen::VectorXd coeffs) { this->coeffs = coeffs; }
 
-  typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
+  //typedef CPPAD_TESTVECTOR(AD<double>) ADvector;
+
+  //using Dvector = CPPAD_TESTVECTOR(double);
+  using ADvector = CPPAD_TESTVECTOR(AD<double>);
+
   void operator()(ADvector& fg, const ADvector& vars) {
     // TODO: implement MPC
     // `fg` a vector of the cost constraints, `vars` is a vector of variable values (state & actuators)
@@ -44,8 +29,22 @@ MPC::~MPC() {}
 
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
+
+  KinematicSolver KSolver;
+
+  auto Vars  = KSolver.GetVariables(state);
+  auto VarsLwB = KSolver.GetVariableBounds(true  /*ForLower*/);
+  auto VarsUpB = KSolver.GetVariableBounds(false /*ForLower*/);
+
+  cout << "Vars \n" << Vars << endl;
+  cout << "VarsLwB \n" << VarsLwB << endl;
+  cout << "VarsUpB \n" << VarsUpB << endl;
+
   size_t i;
-  typedef CPPAD_TESTVECTOR(double) Dvector;
+  //typedef CPPAD_TESTVECTOR(double) Dvector;
+
+  using Dvector = CPPAD_TESTVECTOR(double);
+  //using ADvector = CPPAD_TESTVECTOR(AD<double>);
 
   // TODO: Set the number of model variables (includes both states and inputs).
   // For example: If the state is a 4 element vector, the actuators is a 2
@@ -59,7 +58,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Initial value of the independent variables.
   // SHOULD BE 0 besides initial state.
   Dvector vars(n_vars);
-  for (int i = 0; i < n_vars; i++) {
+  for (i = 0; i < n_vars; i++) {
     vars[i] = 0;
   }
 
@@ -71,7 +70,7 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   // Should be 0 besides initial state.
   Dvector constraints_lowerbound(n_constraints);
   Dvector constraints_upperbound(n_constraints);
-  for (int i = 0; i < n_constraints; i++) {
+  for (i = 0; i < n_constraints; i++) {
     constraints_lowerbound[i] = 0;
     constraints_upperbound[i] = 0;
   }
