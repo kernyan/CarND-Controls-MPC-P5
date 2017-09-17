@@ -4,7 +4,7 @@ Dvector KinematicSolver::GetVariables (const VectorXd &State_in) const{
 
   Dvector Out(nVars);
   for (size_t i = 0; i < nVars; ++i){
-    Out[i] = 0;
+    Out[i] = 0.0;
   }
 
   Out[x_Idx]    = State_in[STATE_X];
@@ -34,6 +34,26 @@ Dvector KinematicSolver::GetVariableBounds (bool ForLower) const{
   for (size_t i = a_Idx; i < nVars; ++i){
     Out[i] = Sign;
   }
+
+  return Out;
+}
+
+Dvector KinematicSolver::GetObjFunctionBounds (const VectorXd &State_in) const{
+
+  // Values that we want the solver to match in the objective functions
+  // except for initial input, all future objective functions has target of 0
+
+  Dvector Out(nObjFuncs);
+  for (size_t i = 0; i < nObjFuncs; ++i){
+    Out[i] = 0.0;
+  }
+
+  Out[x_Idx]    = State_in[STATE_X];
+  Out[y_Idx]    = State_in[STATE_Y];
+  Out[psi_Idx]  = State_in[STATE_PSI];
+  Out[v_Idx]    = State_in[STATE_V];
+  Out[CTE_Idx]  = State_in[STATE_CTE];
+  Out[epsi_Idx] = State_in[STATE_EPSI];
 
   return Out;
 }

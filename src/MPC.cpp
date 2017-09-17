@@ -30,15 +30,27 @@ MPC::~MPC() {}
 vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
   bool ok = true;
 
+  static bool DebugMPC = true;
+
   KinematicSolver KSolver;
 
   auto Vars  = KSolver.GetVariables(state);
   auto VarsLwB = KSolver.GetVariableBounds(true  /*ForLower*/);
   auto VarsUpB = KSolver.GetVariableBounds(false /*ForLower*/);
 
+  if (DebugMPC){
   cout << "Vars \n" << Vars << endl;
   cout << "VarsLwB \n" << VarsLwB << endl;
   cout << "VarsUpB \n" << VarsUpB << endl;
+  }
+
+  Dvector ObjLwB = KSolver.GetObjFunctionBounds(state);
+  Dvector ObjUpB = ObjLwB;
+
+  if (DebugMPC) cout << "ObjLwB\n" << ObjLwB << endl;
+  if (DebugMPC) cout << "ObjUpB\n" << ObjUpB << endl;
+
+
 
   size_t i;
   //typedef CPPAD_TESTVECTOR(double) Dvector;

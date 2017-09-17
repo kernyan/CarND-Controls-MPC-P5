@@ -34,7 +34,7 @@ public:
 
   Dvector GetVariables (const VectorXd &State_in) const;
   Dvector GetVariableBounds (bool ForLower) const;
-  Dvector GetObjFunctionBounds (VectorXd &State_in) const;
+  Dvector GetObjFunctionBounds (const VectorXd &State_in) const;
 
   KinematicObjFunctionSet GetFunctor(const VectorXd &coeff_in) const;
 

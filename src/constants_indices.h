@@ -11,6 +11,7 @@ const size_t N = 10;
 const double dt = 0.1;
 
 const size_t nVars = N * nState + (N - 1) * nActuator; // number of variables to solve for
+const size_t nObjFuncs = N * nState; // number of objective functions
 
 const double ref_cte = 0;
 const double ref_epsi = 0;
