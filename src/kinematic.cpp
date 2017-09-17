@@ -1,6 +1,7 @@
 #include "kinematic.h"
 #include "math.h"
 #include "assert.h"
+#include "tools.h"
 
 void TransformWayPoint(const DataPackage &DP_in,
 		VectorXd &ptsx_transf, VectorXd &ptsy_transf){
@@ -17,6 +18,7 @@ void TransformWayPoint(const DataPackage &DP_in,
     ptsy_transf[i] = (shift_x * sin(0-psi) + shift_y * cos(0-psi));
   }
 }
+
 
 VectorXd GetState(const DataPackage &DP_in,
     const VectorXd &coef,
@@ -36,21 +38,39 @@ VectorXd GetState(const DataPackage &DP_in,
     double epsi = -atan(coef[1]); // psi - arctan(f'(x)), psi being 0 after transform
 
     State << 0, 0, 0, DP_in.Input[VEL], CTE, epsi;
+
   } else {
-    assert (0); // not defined yet
+
+    double steer = DP_in.Input[STR];
+    double v     = DP_in.Input[VEL];
+
+    double x   = v * cos(steer) * Latency_in;
+    double y   = v * sin(steer) * Latency_in;
+    double psi = v * (-steer) / LF * Latency_in;
+    v         += DP_in.Input[ACC] * Latency_in;
+
+    double CTE  = polyeval(coef, x);
+    double epsi = -atan(     coef[1]
+                       + 2 * coef[2] * x
+                       + 3 * coef[3] * x * x);
+
+    State << x, y, psi, v, CTE, epsi;
   }
 
   return State;
 }
 
-double CalculateSteer (double delta_in){
 
-  return delta_in/(MAX_STEER_RAD*LF);
+double CalculateSteer (double steer_in){
+
+  // no adjustment needed
+  return steer_in;
 }
+
 
 double CalculateThrottle (double acc_in){
 
   // as we use throttle as estimator for acceleration,
-  // accelaration ~= throttle in this function
+  // we simply return acceleration as throttle
   return acc_in;
 }

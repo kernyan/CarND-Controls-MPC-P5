@@ -2,8 +2,6 @@
 #define CONSTANTS_INDICES_H
 
 #include "kinematic.h"
-//#include <stdio.h>
-//using namespace std;
 
 const double POS_INF = 1.0e19;
 
@@ -13,9 +11,9 @@ const double dt = 0.1;
 const size_t nVars = N * nState + (N - 1) * nActuator; // number of variables to solve for
 const size_t nObjFuncs = N * nState; // number of objective functions
 
-const double ref_cte = 0;
-const double ref_epsi = 0;
-const double ref_v = 50;
+const double target_CTE = 0;
+const double target_epsi = 0;
+const double target_v = 50;
 
 const size_t x_Idx     = 0;
 const size_t y_Idx     = x_Idx     + N;

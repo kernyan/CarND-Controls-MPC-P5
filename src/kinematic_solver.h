@@ -18,12 +18,18 @@ public:
 
   KinematicObjFunctionSet(VectorXd coeffs_in) :
     coeffs_ (coeffs_in) {};
-  void operator()(ADvector& fg, const ADvector &vars);
+
+  void operator()(ADvector& fg, const ADvector &Vars);
+
+private:
+
+  AD<double> CalculateCost(const ADvector &Vars) const;
 
   // member variables
 
   VectorXd coeffs_;
 };
+
 
 using Dvector = CPPAD_TESTVECTOR(double);
 using ADvector = CPPAD_TESTVECTOR(AD<double>);
