@@ -8,7 +8,8 @@
 
 using namespace std;
 using json = nlohmann::json;
-
+using Eigen::MatrixXd;
+using Eigen::VectorXd;
 
 enum DATA_INPUT {
 

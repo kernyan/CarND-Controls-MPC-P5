@@ -86,15 +86,21 @@ int main() {
         string event = j[0].get<string>();
         if (event == "telemetry") {
           // j[1] is the data JSON object
+          /*
           vector<double> ptsx = j[1]["ptsx"];
           vector<double> ptsy = j[1]["ptsy"];
           double px = j[1]["x"];
           double py = j[1]["y"];
           double psi = j[1]["psi"];
           double v = j[1]["speed"];
-
+          */
           DataPackage Data(j[1]);
-          for (int k = 0; k < Data.WayPointX.size(); ++k){
+
+          static bool DebugInfo = true;
+
+          if (DebugInfo){
+
+          for (size_t k = 0; k < Data.WayPointX.size(); ++k){
             cout << "WayX " << Data.WayPointX[k] << endl;
             cout << "WayY " << Data.WayPointY[k] << endl;
           }
@@ -104,8 +110,30 @@ int main() {
           cout << "vel " << Data.State[VEL] << endl;
           cout << "acc " << Data.State[ACC] << endl;
           cout << "str " << Data.State[STR] << endl;
+          }
 
+          VectorXd ptsx_transform = VectorXd::Constant(Data.WayPointX.size(), 0.0);
+          VectorXd ptsy_transform = VectorXd::Constant(Data.WayPointY.size(), 0.0);
+          TransformWayPoint(Data, ptsx_transform, ptsy_transform);
           
+          if (DebugInfo) cout << "ptsx\n" << ptsx_transform << endl;
+          if (DebugInfo) cout << "ptsy\n" << ptsy_transform << endl;
+
+          auto coefficients = polyfit(ptsx_transform, ptsy_transform, 3);
+
+          if (DebugInfo) cout << "coeffs\n" << coefficients << endl;
+
+          // y = a0 + a1 * x + a2 * x^2 + a3 * x ^ 3
+          // for x = 0, y is simply a0
+          double CTE = coefficients[0]; // approximating shortest dist by using y instead of |(x,y) - (x',y')|
+
+          if (DebugInfo) cout << "CTE " << CTE << endl;
+
+          // current psi - desired psi
+          double epsi = -atan(coefficients[1]); // psi - arctan(f'(x)), psi being 0 after transform
+
+          if (DebugInfo) cout << "epsi " << epsi << endl;
+
           /*
           * TODO: Calculate steering angle and throttle using MPC.
           *
