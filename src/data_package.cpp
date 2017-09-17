@@ -8,7 +8,7 @@ DataPackage::DataPackage(json Data){
   WayPointX = WP_X; // assigning Data["ptsx"] directly to WayPointX doesn't work
   WayPointY = WP_Y; // due to ambiguous = operator of json
 
-  State = {
+  Input = {
     Data["x"],
     Data["y"],
     Data["psi"],

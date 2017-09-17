@@ -104,12 +104,12 @@ int main() {
             cout << "WayX " << Data.WayPointX[k] << endl;
             cout << "WayY " << Data.WayPointY[k] << endl;
           }
-          cout << "x "   << Data.State[PX] << endl;
-          cout << "y "   << Data.State[PY] << endl;
-          cout << "psi " << Data.State[PSI] << endl;
-          cout << "vel " << Data.State[VEL] << endl;
-          cout << "acc " << Data.State[ACC] << endl;
-          cout << "str " << Data.State[STR] << endl;
+          cout << "x "   << Data.Input[PX] << endl;
+          cout << "y "   << Data.Input[PY] << endl;
+          cout << "psi " << Data.Input[PSI] << endl;
+          cout << "vel " << Data.Input[VEL] << endl;
+          cout << "acc " << Data.Input[ACC] << endl;
+          cout << "str " << Data.Input[STR] << endl;
           }
 
           VectorXd ptsx_transform = VectorXd::Constant(Data.WayPointX.size(), 0.0);
@@ -121,6 +121,7 @@ int main() {
 
           auto coefficients = polyfit(ptsx_transform, ptsy_transform, 3);
 
+          /*
           if (DebugInfo) cout << "coeffs\n" << coefficients << endl;
 
           // y = a0 + a1 * x + a2 * x^2 + a3 * x ^ 3
@@ -133,6 +134,7 @@ int main() {
           double epsi = -atan(coefficients[1]); // psi - arctan(f'(x)), psi being 0 after transform
 
           if (DebugInfo) cout << "epsi " << epsi << endl;
+          */
 
           /*
           * TODO: Calculate steering angle and throttle using MPC.
@@ -140,8 +142,16 @@ int main() {
           * Both are in between [-1, 1].
           *
           */
-          double steer_value;
-          double throttle_value;
+
+          double Latency = 0;
+          auto State = GetState(Data, coefficients, Latency);
+
+          if (DebugInfo) cout << "State \n" << State << endl;
+
+          auto Solution = mpc.Solve(State, coefficients);
+
+          double steer_value = CalculateSteer(0);
+          double throttle_value = CalculateThrottle(0);
 
           json msgJson;
           // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.

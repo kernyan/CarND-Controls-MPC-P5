@@ -27,7 +27,7 @@ struct DataPackage {
 
   vector<double> WayPointX;
   vector<double> WayPointY;
-  vector<double> State;
+  vector<double> Input;
 
   DataPackage(json Data);
 };
