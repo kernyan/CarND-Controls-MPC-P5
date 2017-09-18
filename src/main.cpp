@@ -59,7 +59,7 @@ int main() {
           // the points in the simulator are connected by a Green line
 
           for (size_t i = 2; i < Solution.size(); ++i){
-            if (i%2 == 0){
+            if (i % 2 == 0){
               mpc_x_vals.push_back(Solution[i]);
             } else {
               mpc_y_vals.push_back(Solution[i]);
@@ -76,12 +76,10 @@ int main() {
           //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
           // the points in the simulator are connected by a Yellow line
 
-          double poly_inc = 2.5;
-          int num_points = 25;
-
-          for (int i = 1; i < num_points; ++i){
-            next_x_vals.push_back(poly_inc*i);
-            next_y_vals.push_back(polyeval(coefficients, poly_inc*i));
+          double y_step = 2.5;          
+          for (int i = 1; i < 20; ++i){
+            next_x_vals.push_back(y_step*i);
+            next_y_vals.push_back(polyeval(coefficients, y_step*i));
           }
 
           msgJson["next_x"] = next_x_vals;
