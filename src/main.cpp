@@ -31,37 +31,14 @@ int main() {
           // j[1] is the data JSON object
           DataPackage Data(j[1]);
 
-          static bool DebugInfo = false;
-
-          if (DebugInfo){
-
-          for (size_t k = 0; k < Data.WayPointX.size(); ++k){
-            cout << "WayX " << Data.WayPointX[k] << endl;
-            cout << "WayY " << Data.WayPointY[k] << endl;
-          }
-          cout << "x "   << Data.Input[PX] << endl;
-          cout << "y "   << Data.Input[PY] << endl;
-          cout << "psi " << Data.Input[PSI] << endl;
-          cout << "vel " << Data.Input[VEL] << endl;
-          cout << "acc " << Data.Input[ACC] << endl;
-          cout << "str " << Data.Input[STR] << endl;
-          }
-
           VectorXd ptsx_transform = VectorXd::Constant(Data.WayPointX.size(), 0.0);
           VectorXd ptsy_transform = VectorXd::Constant(Data.WayPointY.size(), 0.0);
           TransformWayPoint(Data, ptsx_transform, ptsy_transform);
           
-          if (DebugInfo) cout << "ptsx\n" << ptsx_transform << endl;
-          if (DebugInfo) cout << "ptsy\n" << ptsy_transform << endl;
-
           auto coefficients = polyfit(ptsx_transform, ptsy_transform, 3);
-
-          if (DebugInfo) cout << "coeffs\n" << coefficients << endl;
 
           double Latency = 0.1;
           auto State = GetState(Data, coefficients, Latency);
-
-          if (DebugInfo) cout << "State \n" << State << endl;
 
           auto Solution = mpc.Solve(State, coefficients);
 
